@@ -2,6 +2,12 @@ const router  = require("express").Router()
 const multer  = require("multer");
 const path = require("path");
 const csvtojson = require('csvtojson'); 
+// import {PythonShell} from "python-shell"
+const {PythonShell} =  require("python-shell");
+const fs = require("fs")
+const csv  = require("csv-parser");
+const spawn = require('child_process').spawn;
+
 let storage = multer.diskStorage({
 
     destination: (req,file,cb)=> cb(null,"uploads/"),
@@ -32,24 +38,26 @@ router.post("/Postapi",(req,res)=>{
         if(err){
             return res.status(500).send({error:err.message});
         }
+        fs.writeFileSync('./abc.txt', req.file.path);
 
-        csvtojson().fromFile(req.file.path).then(source=>{
-            console.log(req.file.filename)
-            for (var i=0;i<source.length;i++){
-                const CinNUmber = source[i]["CIN"]
-            }
-        })
-        
-        res.render("hander")
+        PythonShell.run('./pythonScripts/MCAGov.py', null, function (errs) {
+            if (errs) throw errs;
+            console.log(path.dirname(require.main.filename))      
+            res.json({mainFile:"dataFileFolder/AN CIN LIST_DATA.csv",ErroFile:"dataFileFolder/ErrorGivenByWebsite.csv"})
+          });
+
     })
 
     // res.json({message:"Sent"})
 })
 
 router.get("/:dir/:file",(req,res)=>{
-    const file = req.params.file;
-    const dir = req.params.dir;
-    console.log(file+","+dir); 
+    const dir = req.params.dir
+    const file = req.params.file
+    newPah = path.join(path.dirname(require.main.filename),"dataFileFolder") 
+    res.sendFile(newPah+"/"+file)
+
 })
+
 
 module.exports = router
