@@ -36,7 +36,7 @@ router.post("/Postapi",(req,res)=>{
         csvtojson().fromFile(req.file.path).then(source=>{
             console.log(req.file.filename)
             for (var i=0;i<source.length;i++){
-                console.log(source[i]["CIN"])
+                const CinNUmber = source[i]["CIN"]
             }
         })
         
@@ -46,6 +46,10 @@ router.post("/Postapi",(req,res)=>{
     // res.json({message:"Sent"})
 })
 
-
+router.get("/:dir/:file",(req,res)=>{
+    const file = req.params.file;
+    const dir = req.params.dir;
+    console.log(file+","+dir); 
+})
 
 module.exports = router
